@@ -65,7 +65,7 @@ function LoveStoryForm() {
       queryClient.setQueryData(["journey", data.id], data);
       createMemories(data.id);
     },
-    onError: (error) => {
+    onError: () => {
       setErrors({
         general:
           "Ocorreu um erro ao salvar sua jornada. Por favor, tente novamente.",
