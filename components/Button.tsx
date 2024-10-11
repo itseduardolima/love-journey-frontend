@@ -18,7 +18,7 @@ export const Button = ({
   iconPosition = "left",
 }: ButtonProps) => {
   const baseClasses =
-    "px-4 py-2 rounded-lg hover:transition-colors flex items-center justify-center";
+    "px-4 w-full py-2 rounded-lg hover:transition-colors flex items-center justify-center";
   const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "";
 
   const variantClasses =

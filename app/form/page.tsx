@@ -28,6 +28,8 @@ import { Input } from "@/components/Input";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
 
+import { DatePicker } from "@/components/DatePicker";
+
 function LoveStoryForm() {
   const [step, setStep] = useState(0);
   const [coupleData, setCoupleData] = useState<CoupleData>({
@@ -186,12 +188,8 @@ function LoveStoryForm() {
     validateStep();
   };
 
-  const handleDateChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const inputDate = e.target.value;
-
-    const formattedDate = inputDate
-      ? format(parse(inputDate, "yyyy-MM-dd", new Date()), "dd/MM/yyyy")
-      : "";
+  const handleDateChange = (date: Date | undefined) => {
+    const formattedDate = date ? format(date, "dd/MM/yyyy") : "";
     setCurrentMemory((prev) => ({ ...prev, date: formattedDate }));
     validateStep();
   };
@@ -294,18 +292,14 @@ function LoveStoryForm() {
         )}
       </div>
       <div>
-        <Input
-          type="date"
-          name="date"
-          value={
+        <DatePicker
+          date={
             currentMemory.date
-              ? format(
-                  parse(currentMemory.date, "dd/MM/yyyy", new Date()),
-                  "yyyy-MM-dd"
-                )
-              : ""
+              ? parse(currentMemory.date, "dd/MM/yyyy", new Date())
+              : undefined
           }
-          onChange={handleDateChange}
+          onDateChange={handleDateChange}
+          placeholder="Selecione uma data"
         />
         {errors.date && (
           <p className="text-red-500 text-sm mt-1">{errors.date}</p>
@@ -422,10 +416,10 @@ function LoveStoryForm() {
       default:
         return (
           <div className="space-y-4">
-            <div className="flex justify-between items-center mb-4">
+            <div className="flex flex-col gap-5 mb-4">
               <h2 className="text-2xl font-bold text-pink-300">Lembranças</h2>
               <Button
-                label="Add"
+                label="Adicionar lembrança"
                 variant="primary"
                 onClick={() => setShowMemoryForm(true)}
                 icon={<Plus size={20} className="mr-2" />}
@@ -477,7 +471,9 @@ function LoveStoryForm() {
     return (
       <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
         <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-          <h2 className="text-2xl font-bold text-pink-300 mb-6">Sua linha do tempo está pronta!</h2>
+          <h2 className="text-2xl font-bold text-pink-300 mb-6">
+            Sua linha do tempo está pronta!
+          </h2>
           <div className="mb-6 flex justify-center">
             <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
           </div>
@@ -504,11 +500,12 @@ function LoveStoryForm() {
             </button>
           </div>
           <p className="text-sm text-gray-400 text-center">
-            Compartilhe o link ou o código QR para que outros possam ver sua linha do tempo!
+            Compartilhe o link ou o código QR para que outros possam ver sua
+            linha do tempo!
           </p>
         </div>
       </div>
-    )
+    );
   }
 
   return (
