@@ -10,6 +10,7 @@ import {
   Download,
   Copy,
   Trash,
+  X,
 } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
@@ -319,23 +320,25 @@ function LoveStoryForm() {
         )}
       </div>
       <div>
+        <label>Título</label>
         <Input
           type="text"
           name="title"
           value={currentMemory.title}
           onChange={handleInputChange}
-          placeholder="Título da Lembrança"
+          placeholder="Ex: Primeiro beijo"
         />
         {errors.title && (
           <p className="text-red-500 text-sm mt-1">{errors.title}</p>
         )}
       </div>
       <div>
+        <label>Descrição</label>
         <TextArea
           name="description"
           value={currentMemory.description}
           onChange={handleInputChange}
-          placeholder="Descrição da Lembrança"
+          placeholder="Ex: Senti meu coração acelerar quando..."
         />
         {errors.description && (
           <p className="text-red-500 text-sm mt-1">{errors.description}</p>
@@ -440,23 +443,18 @@ function LoveStoryForm() {
             </div>
             {memories.map((memory) => (
               <div
+                onClick={() => handleEditMemory(memory.id)}
                 key={memory.id}
-                className="bg-gray-700 p-4 rounded-lg mb-4 flex justify-between items-center"
+                className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
               >
                 <h3 className="text-lg font-semibold text-pink-300 truncate flex-grow mr-4">
                   {memory.title}
                 </h3>
                 <div>
                   <Button
-                    onClick={() => handleEditMemory(memory.id)}
-                    variant="edit"
-                    icon={<Edit size={20} />}
-                  />
-
-                  <Button
                     onClick={() => handleDeleteMemory(memory.id)}
                     variant="delete"
-                    icon={<Trash size={20} />}
+                    icon={<X size={20} />}
                   />
                 </div>
               </div>

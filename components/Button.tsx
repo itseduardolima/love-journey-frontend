@@ -29,7 +29,7 @@ export const Button = ({
       : variant === "edit"
       ? "text-blue-500 hover:text-blue-600"
       : variant === "delete"
-      ? "text-red-500 hover:text-red-600"
+      ? "text-red-500 w-2 hover:text-red-600"
       : "bg-green-600 text-white hover:bg-green-500";
 
   return (
