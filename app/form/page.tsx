@@ -23,12 +23,19 @@ import QRCode from "qrcode";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
 import { CoupleData } from "@/types/CoupleData";
-import { Memory } from "@/types/Memory";
 import { Input } from "@/components/Input";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
-
 import { DatePicker } from "@/components/DatePicker";
+
+interface Memory {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  photo: File | null;
+  photoMimeType: string;
+}
 
 function LoveStoryForm() {
   const [step, setStep] = useState(0);
@@ -44,6 +51,7 @@ function LoveStoryForm() {
     title: "",
     description: "",
     photo: null,
+    photoMimeType: "",
   });
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isNextDisabled, setIsNextDisabled] = useState(true);
@@ -197,7 +205,11 @@ function LoveStoryForm() {
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      setCurrentMemory((prev) => ({ ...prev, photo: file }));
+      setCurrentMemory((prev) => ({
+        ...prev,
+        photo: file,
+        photoMimeType: file.type,
+      }));
       validateStep();
     }
   };
@@ -221,6 +233,7 @@ function LoveStoryForm() {
         title: "",
         description: "",
         photo: null,
+        photoMimeType: "",
       });
       setEditingMemoryId(null);
       setShowMemoryForm(false);
@@ -417,7 +430,7 @@ function LoveStoryForm() {
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-5 mb-4">
-              <h2 className="text-2xl font-bold text-pink-300">Lembranças</h2>
+              <h2 className="text-2xl font-bold  text-pink-300">Lembranças</h2>
               <Button
                 label="Adicionar lembrança"
                 variant="primary"

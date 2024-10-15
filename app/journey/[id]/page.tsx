@@ -18,6 +18,18 @@ import { ErrorPage } from "@/components/ErrorPage";
 import { TimelineNotFound } from "@/components/TimelineNotFound";
 import { Loader } from "@/components/Loader";
 
+interface Memory {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  photo: {
+    data: number[];
+    type: string;
+  };
+  photoMimeType: string;
+}
+
 function JourneyPage() {
   const params = useParams();
   const { id } = params;
@@ -43,6 +55,23 @@ function JourneyPage() {
   if (!journey) {
     return <TimelineNotFound />;
   }
+
+  const renderMemoryImage = (memory: Memory) => {
+    if (memory.photo && memory.photo.data) {
+      const uint8Array = new Uint8Array(memory.photo.data);
+      const blob = new Blob([uint8Array], { type: memory.photoMimeType });
+      const imageUrl = URL.createObjectURL(blob);
+      return (
+        <img
+          src={imageUrl}
+          alt={memory.title}
+          className="w-full h-[500px] object-cover"
+          onLoad={() => URL.revokeObjectURL(imageUrl)}
+        />
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100" ref={containerRef}>
@@ -120,11 +149,7 @@ function JourneyPage() {
                       index % 2 === 0 ? "md:ml-8" : "md:mr-8"
                     }`}
                   >
-                    <img
-                      src={`${process.env.NEXT_PUBLIC_URL}${memory.photo}`}
-                      alt={memory.title}
-                      className="w-full h-[500px] object-cover"
-                    />
+                    {renderMemoryImage(memory)}
                   </motion.div>
                 </div>
                 <div className="w-full md:w-5/12 pl-12 md:pl-0">
@@ -141,7 +166,7 @@ function JourneyPage() {
                     ></div>
                   </div>
                   <motion.div
-                    className={`  p-2   ${
+                    className={`p-2 ${
                       index % 2 === 0 ? "md:mr-32" : "md:ml-32"
                     }`}
                   >

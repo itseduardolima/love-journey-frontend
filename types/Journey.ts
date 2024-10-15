@@ -8,3 +8,4 @@ export type Journey = {
   startDate: string;
   memories: Memory[];
 };
+
