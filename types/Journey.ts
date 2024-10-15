@@ -1,4 +1,14 @@
-import { Memory } from "./Memory";
+interface Memory {
+  id: string;
+  date: string;
+  title: string;
+  description: string;
+  photo: {
+    data: number[];
+    type: string;
+  };
+  photoMimeType: string;
+}
 
 export type Journey = {
   id: string;
