@@ -18,7 +18,6 @@ import { Input } from "@/components/Input";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
 import { DatePicker } from "@/components/DatePicker";
-import { useRouter } from "next/navigation";
 
 interface Memory {
   id: string;
@@ -50,12 +49,11 @@ function LoveStoryForm() {
   const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
   const [showMemoryForm, setShowMemoryForm] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
-  const [paymentStatus, setPaymentStatus] = useState<string>("pending");
+
   const [journeyId, setJourneyId] = useState<string | null>(null);
-  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
+  console.log(journeyId);
 
   const queryClient = useQueryClient();
-  const router = useRouter();
 
   const totalSteps = 5;
 
