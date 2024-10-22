@@ -1,15 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import {
-  ArrowRight,
-  ArrowLeft,
-  Plus,
-  Check,
-  Download,
-  Copy,
-  X,
-} from "lucide-react";
+import React, { useState, useEffect } from "react";
+import { ArrowRight, ArrowLeft, Plus, Check, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import {
   QueryClient,
@@ -18,7 +10,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { format, parse } from "date-fns";
-import QRCode from "qrcode";
+import { initMercadoPago } from "@mercadopago/sdk-react";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
 import { CoupleData } from "@/types/CoupleData";
@@ -26,6 +18,7 @@ import { Input } from "@/components/Input";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
 import { DatePicker } from "@/components/DatePicker";
+import { useRouter } from "next/navigation";
 
 interface Memory {
   id: string;
@@ -56,14 +49,21 @@ function LoveStoryForm() {
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
   const [showMemoryForm, setShowMemoryForm] = useState(false);
-  const [journeyLink, setJourneyLink] = useState<string | null>(null);
-  const [qrCodeUrl, setQrCodeUrl] = useState<string | null>(null);
-  const [isCopied, setIsCopied] = useState(false);
-  const linkInputRef = useRef<HTMLInputElement>(null);
+  const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<string>("pending");
+  const [journeyId, setJourneyId] = useState<string | null>(null);
+  const [isCheckingPayment, setIsCheckingPayment] = useState(false);
 
   const queryClient = useQueryClient();
+  const router = useRouter();
 
-  const totalSteps = 4;
+  const totalSteps = 5;
+
+  useEffect(() => {
+    initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY as string, {
+      locale: "pt-BR",
+    });
+  }, []);
 
   const createJourneyMutation = useMutation({
     mutationFn: async (data: CoupleData) => {
@@ -72,6 +72,7 @@ function LoveStoryForm() {
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["journey", data.id], data);
+      setJourneyId(data.id);
       createMemories(data.id);
     },
     onError: () => {
@@ -105,53 +106,29 @@ function LoveStoryForm() {
     },
   });
 
+  const createPaymentMutation = useMutation({
+    mutationFn: async (journeyId: string) => {
+      const response = await api.post(`/payment/${journeyId}`);
+      return response.data;
+    },
+    onSuccess: (data) => {
+      setPreferenceId(data.id);
+      setStep(4);
+    },
+    onError: () => {
+      setErrors({
+        general:
+          "Ocorreu um erro ao criar o pagamento. Por favor, tente novamente.",
+      });
+    },
+  });
+
   const createMemories = async (journeyId: string) => {
     for (const memory of memories) {
       await createMemoryMutation.mutateAsync({ memory, journeyId });
     }
-    const link = `${window.location.origin}/journey/${journeyId}`;
-    setJourneyLink(link);
-    generateQRCode(link);
+    createPaymentMutation.mutate(journeyId);
   };
-
-  const generateQRCode = async (url: string) => {
-    try {
-      const qrCodeDataUrl = await QRCode.toDataURL(url);
-      setQrCodeUrl(qrCodeDataUrl);
-    } catch (error) {
-      console.error("Error generating QR code:", error);
-      setErrors({
-        general:
-          "Ocorreu um erro ao gerar o código QR. Por favor, tente novamente.",
-      });
-    }
-  };
-
-  const handleDownloadQRCode = () => {
-    if (qrCodeUrl) {
-      const link = document.createElement("a");
-      link.href = qrCodeUrl;
-      link.download = "love_journey_qr_code.png";
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-    }
-  };
-
-  const handleCopyLink = () => {
-    if (linkInputRef.current) {
-      linkInputRef.current.select();
-      document.execCommand("copy");
-      setIsCopied(true);
-    }
-  };
-
-  useEffect(() => {
-    if (isCopied) {
-      const timer = setTimeout(() => setIsCopied(false), 2000);
-      return () => clearTimeout(timer);
-    }
-  }, [isCopied]);
 
   const validateStep = () => {
     let isValid = true;
@@ -166,7 +143,7 @@ function LoveStoryForm() {
         isValid = false;
         newErrors.title = "Campo obrigatório";
       }
-    } else {
+    } else if (step === 3) {
       if (showMemoryForm) {
         if (!currentMemory.date) newErrors.date = "Campo obrigatório";
         if (!currentMemory.title) newErrors.title = "Campo obrigatório";
@@ -349,7 +326,6 @@ function LoveStoryForm() {
           variant="default"
           label="Cancelar"
         />
-
         <Button
           onClick={handleAddMemory}
           label={editingMemoryId ? "Salvar Alterações" : "Salvar"}
@@ -400,7 +376,7 @@ function LoveStoryForm() {
         return (
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-pink-300 mb-4">
-              Qual é o título história do casal?
+              Qual é o título da história do casal?
             </h2>
             <div>
               <Input
@@ -427,7 +403,7 @@ function LoveStoryForm() {
             </p>
           </div>
         );
-      default:
+      case 3:
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-5 mb-4">
@@ -469,52 +445,38 @@ function LoveStoryForm() {
             )}
           </div>
         );
+      case 4:
+        return (
+          <div className="space-y-4">
+            <h2 className="text-2xl font-bold text-pink-300 mb-4">Pagamento</h2>
+
+            <p className="text-gray-300 mb-4">
+              Para visualizar sua linha do tempo, por favor realize o pagamento.
+            </p>
+
+            <Button
+              onClick={() =>
+                window.open(
+                  `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${preferenceId}`,
+                  "_blank"
+                )
+              }
+              label="Ir para o Pagamento"
+              variant="primary"
+            />
+          </div>
+        );
+      default:
+        return null;
     }
   };
 
-  if (createJourneyMutation.isPending || createMemoryMutation.isPending) {
+  if (
+    createJourneyMutation.isPending ||
+    createMemoryMutation.isPending ||
+    createPaymentMutation.isPending
+  ) {
     return <Loader />;
-  }
-
-  if (journeyLink && qrCodeUrl) {
-    return (
-      <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
-        <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-          <h2 className="text-2xl font-bold text-pink-300 mb-6">
-            Sua linha do tempo está pronta!
-          </h2>
-          <div className="mb-6 flex justify-center">
-            <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
-          </div>
-          <button
-            onClick={handleDownloadQRCode}
-            className="w-full px-4 py-2 bg-pink-600 text-white rounded-lg hover:bg-pink-500 transition-colors flex items-center justify-center mb-4"
-          >
-            <Download size={20} className="mr-2" />
-            Download QR Code
-          </button>
-          <div className="flex items-center mb-4">
-            <input
-              ref={linkInputRef}
-              type="text"
-              value={journeyLink}
-              readOnly
-              className="flex-grow p-[6px] bg-gray-700 text-white rounded-l-lg focus:outline-none"
-            />
-            <button
-              onClick={handleCopyLink}
-              className="px-4 py-2 bg-pink-600 text-white rounded-r-lg hover:bg-pink-500 transition-colors"
-            >
-              {isCopied ? <Check size={20} /> : <Copy size={20} />}
-            </button>
-          </div>
-          <p className="text-sm text-gray-400 text-center">
-            Compartilhe o link ou o código QR para que outros possam ver sua
-            linha do tempo!
-          </p>
-        </div>
-      </div>
-    );
   }
 
   return (
