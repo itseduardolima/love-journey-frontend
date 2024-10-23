@@ -342,7 +342,7 @@ function LoveStoryForm() {
         return (
           <div className="space-y-4">
             <h2 className="text-2xl font-bold text-pink-300 mb-4">
-              Bem-vindos! Vamos começar com seus nomes.
+              Bem-vindo! Vamos começar com os nomes.
             </h2>
             <div>
               <Input

@@ -147,15 +147,11 @@ function JourneyPage() {
                 } items-center md:items-start`}
               >
                 <div className="w-4/5 md:w-5/12 mb-6 md:mb-0">
-                  <motion.div
-                    className={`rounded-xl overflow-hidden shadow-2xl ${
-                      index % 2 === 0 ? "md:ml-8" : "md:mr-8"
-                    }`}
-                  >
+                  <motion.div className="rounded-xl overflow-hidden shadow-2xl">
                     {renderMemoryImage(memory)}
                   </motion.div>
                 </div>
-                <div className="w-full md:w-5/12 pl-12 md:pl-0">
+                <div className="w-full md:w-5/6 pl-12 md:pl-0">
                   <div className="flex items-center mb-4">
                     <motion.div className="w-8 h-8 bg-pink-500 rounded-full border-4 border-gray-900 z-10 absolute left-0 md:left-1/2 transform md:-translate-x-1/2 flex items-center justify-center">
                       {React.createElement(iconMap[index % iconMap.length], {
@@ -169,8 +165,8 @@ function JourneyPage() {
                     ></div>
                   </div>
                   <motion.div
-                    className={`p-2 ${
-                      index % 2 === 0 ? "md:mr-32" : "md:ml-32"
+                    className={`p-2 sm:w-3/5  ${
+                      index % 2 === 0 ? "sm:mr-1" : "sm:ml-60"
                     }`}
                   >
                     <div className="flex items-center mb-2">
@@ -182,7 +178,7 @@ function JourneyPage() {
                     <h3 className="text-xl font-bold text-white mb-3 break-words">
                       {memory.title}
                     </h3>
-                    <p className="text-gray-300 leading-relaxed break-words">
+                    <p className="text-gray-300 text-justify leading-relaxed break-words">
                       {memory.description}
                     </p>
                   </motion.div>
