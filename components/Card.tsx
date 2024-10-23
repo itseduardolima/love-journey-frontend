@@ -25,7 +25,7 @@ interface TimelineExampleProps {
   link: string;
 }
 
-export default function TimelineExample({ id, imageSrc, coupleName, link }: TimelineExampleProps) {
+export default function TimelineExample({ imageSrc, coupleName, link }: TimelineExampleProps) {
   const [ref, inView] = useInView({
     triggerOnce: true,
     threshold: 0.1,
