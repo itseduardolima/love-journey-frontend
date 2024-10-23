@@ -18,7 +18,7 @@ export default function PaymentErrorPage() {
   }, []);
 
   const handleRetry = () => {
-    router.push("/");
+    router.push("/form");
   };
 
   return (

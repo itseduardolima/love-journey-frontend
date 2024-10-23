@@ -8,8 +8,6 @@ import {
   QueryClientProvider,
   useQuery,
 } from "@tanstack/react-query";
-import { format } from "date-fns";
-import { ptBR } from "date-fns/locale";
 import React, { useRef } from "react";
 import { api } from "@/services/api";
 import { Journey } from "@/types/Journey";
@@ -17,6 +15,7 @@ import { iconMap } from "@/lib/utils";
 import { ErrorPage } from "@/components/ErrorPage";
 import { TimelineNotFound } from "@/components/TimelineNotFound";
 import { Loader } from "@/components/Loader";
+import { formatDate } from "@/lib/formatString";
 
 interface Memory {
   id: string;
@@ -73,6 +72,10 @@ function JourneyPage() {
     return null;
   };
 
+  const sortedMemories = [...journey.memories].sort(
+    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime()
+  );
+
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100" ref={containerRef}>
       {/* Hero Section */}
@@ -97,7 +100,7 @@ function JourneyPage() {
               initial={{ y: 50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ delay: 0.2, duration: 0.8 }}
-              className="text-lg sm:text-xl md:text-2xl mb-8 text-gray-300"
+              className="text-2xl md:text-3xl mb-8 text-gray-300 font-extrabold"
             >
               {journey.partner1} e {journey.partner2}
             </motion.p>
@@ -129,7 +132,7 @@ function JourneyPage() {
         </motion.h2>
         <div className="max-w-6xl mx-auto relative">
           <motion.div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-500 to-purple-600" />
-          {journey.memories.map((memory, index) => (
+          {sortedMemories.map((memory, index) => (
             <motion.div
               key={memory.id}
               initial={{ opacity: 0, y: 50 }}
@@ -173,11 +176,7 @@ function JourneyPage() {
                     <div className="flex items-center mb-2">
                       <Calendar className="w-5 h-5 text-pink-500 mr-2" />
                       <span className="text-xl font-semibold text-pink-400">
-                        {format(
-                          new Date(memory.date),
-                          "d 'de' MMMM 'de' yyyy",
-                          { locale: ptBR }
-                        )}
+                        {formatDate(memory.date)}
                       </span>
                     </div>
                     <h3 className="text-xl font-bold text-white mb-3 break-words">
@@ -209,7 +208,7 @@ function JourneyPage() {
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5 }}
-          className="text-2xl sm:text-3xl md:text-4xl font-bold mt-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600"
+          className="text-2xl text-love sm:text-3xl md:text-4xl font-bold mt-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600"
         >
           Te amo!
         </motion.p>
@@ -220,7 +219,7 @@ function JourneyPage() {
 
 const queryClient = new QueryClient();
 
-export default function Page() {
+export default function Component() {
   return (
     <QueryClientProvider client={queryClient}>
       <JourneyPage />
