@@ -1,5 +1,5 @@
 import React from "react";
-import Image from "next/image";
+import Image, { StaticImageData } from "next/image";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
@@ -20,7 +20,7 @@ const cardHover = {
 
 interface TimelineExampleProps {
   id: string;
-  imageSrc: any;
+  imageSrc: StaticImageData;
   coupleName: string;
   link: string;
 }
