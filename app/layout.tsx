@@ -8,6 +8,12 @@ const geistSans = localFont({
   weight: "100 900",
 });
 
+const love = localFont({
+  src: "./fonts/LoveRegular.ttf",
+  variable: "--love",
+  weight: "100 900",
+});
+
 export const metadata: Metadata = {
   title: "Love Journey",
   description:
@@ -21,7 +27,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-Br">
-      <body className={`${geistSans.variable}  antialiased`}>{children}</body>
+      <body className={`${geistSans.variable} ${love.variable} ${love.variable} antialiased`}>{children}</body>
     </html>
   );
 }
