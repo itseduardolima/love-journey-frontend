@@ -10,7 +10,7 @@ import {
   useQueryClient,
 } from "@tanstack/react-query";
 import { format, parse } from "date-fns";
-import { initMercadoPago } from "@mercadopago/sdk-react";
+import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
 import { CoupleData } from "@/types/CoupleData";
@@ -48,16 +48,10 @@ function LoveStoryForm() {
   const [isNextDisabled, setIsNextDisabled] = useState(true);
   const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
   const [showMemoryForm, setShowMemoryForm] = useState(false);
-  const [preferenceId, setPreferenceId] = useState<string | null>(null);
   const queryClient = useQueryClient();
+  const router = useRouter();
 
-  const totalSteps = 5;
-
-  useEffect(() => {
-    initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY as string, {
-      locale: "pt-BR",
-    });
-  }, []);
+  const totalSteps = 4;
 
   const createJourneyMutation = useMutation({
     mutationFn: async (data: CoupleData) => {
@@ -99,28 +93,11 @@ function LoveStoryForm() {
     },
   });
 
-  const createPaymentMutation = useMutation({
-    mutationFn: async (journeyId: string) => {
-      const response = await api.post(`/payment/${journeyId}`);
-      return response.data;
-    },
-    onSuccess: (data) => {
-      setPreferenceId(data.id);
-      setStep(4);
-    },
-    onError: () => {
-      setErrors({
-        general:
-          "Ocorreu um erro ao criar o pagamento. Por favor, tente novamente.",
-      });
-    },
-  });
-
   const createMemories = async (journeyId: string) => {
     for (const memory of memories) {
       await createMemoryMutation.mutateAsync({ memory, journeyId });
     }
-    createPaymentMutation.mutate(journeyId);
+    router.push(`/qr-code/${journeyId}`);
   };
 
   const validateStep = () => {
@@ -145,7 +122,7 @@ function LoveStoryForm() {
         if (!currentMemory.photo) newErrors.photo = "Campo obrigatório";
         isValid = Object.keys(newErrors).length === 0;
       } else {
-        isValid = memories.length >= 3 && memories.length <= 10;
+        isValid = memories.length === 3;
       }
     }
 
@@ -240,9 +217,9 @@ function LoveStoryForm() {
   };
 
   const handleSubmit = () => {
-    if (memories.length < 3 || memories.length > 10) {
+    if (memories.length !== 3) {
       setErrors({
-        general: "Adicione entre 3 e 10 lembranças antes de finalizar.",
+        general: "Adicione exatamente 3 lembranças antes de finalizar.",
       });
       return;
     }
@@ -392,7 +369,7 @@ function LoveStoryForm() {
               Agora, vamos adicionar lembranças especiais!
             </h2>
             <p className="text-gray-300">
-              Adicione entre 3 e 10 lembranças para sua linha do tempo.
+              Adicione exatamente 3 lembranças para sua linha do tempo.
             </p>
           </div>
         );
@@ -401,7 +378,7 @@ function LoveStoryForm() {
           <div className="space-y-4">
             <div className="flex flex-col gap-5 mb-4">
               <h2 className="text-2xl font-bold  text-pink-300">Lembranças</h2>
-              {memories.length < 10 && (
+              {memories.length < 3 && (
                 <Button
                   label="Adicionar lembrança"
                   variant="primary"
@@ -429,7 +406,7 @@ function LoveStoryForm() {
               </div>
             ))}
             {showMemoryForm && renderMemoryForm()}
-            {memories.length >= 3 && memories.length <= 10 && (
+            {memories.length === 3 && (
               <div className="flex justify-end mt-6">
                 <Button
                   onClick={handleSubmit}
@@ -440,37 +417,12 @@ function LoveStoryForm() {
             )}
           </div>
         );
-      case 4:
-        return (
-          <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-pink-300 mb-4">Pagamento</h2>
-
-            <p className="text-gray-300 mb-4">
-              Para visualizar sua linha do tempo, por favor realize o pagamento.
-            </p>
-
-            <Button
-              onClick={() =>
-                window.open(
-                  `https://www.mercadopago.com.br/checkout/v1/redirect?pref_id=${preferenceId}`,
-                  "_blank"
-                )
-              }
-              label="Ir para o Pagamento"
-              variant="primary"
-            />
-          </div>
-        );
       default:
         return null;
     }
   };
 
-  if (
-    createJourneyMutation.isPending ||
-    createMemoryMutation.isPending ||
-    createPaymentMutation.isPending
-  ) {
+  if (createJourneyMutation.isPending || createMemoryMutation.isPending) {
     return <Loader />;
   }
 
