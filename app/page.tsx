@@ -4,6 +4,13 @@ import React from "react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
 import {
+  Card,
+  CardHeader,
+  CardTitle,
+  CardContent,
+  CardFooter,
+} from "@/components/ui/card";
+import {
   ArrowRight,
   Heart,
   Camera,
@@ -14,14 +21,18 @@ import {
   QrCode,
   Github,
   Globe,
+  Check,
+  X,
+  Sparkles,
 } from "lucide-react";
 import { motion } from "framer-motion";
 import { useInView } from "react-intersection-observer";
 
 import heroImage from "@/public/assests/images/img-hero.jpg";
 import { useRouter } from "next/navigation";
-import TimelineExample from "@/components/Card";
+import TimelineExample from "@/components/TimeLineExample";
 import { mockTimelineData } from "@/mock/data";
+import Link from "next/link";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 50 },
@@ -60,11 +71,36 @@ const AnimatedSection: React.FC<AnimatedSectionProps> = ({ children }) => {
   );
 };
 
+const PlanFeature = ({
+  included,
+  children,
+}: {
+  included: boolean;
+  children: React.ReactNode;
+}) => (
+  <li className="flex items-center space-x-3">
+    {included ? (
+      <Check className="h-5 w-5 flex-shrink-0 text-green-500" />
+    ) : (
+      <X className="h-5 w-5 flex-shrink-0 text-red-500" />
+    )}
+    <span
+      className={`text-base ${included ? "text-gray-200" : "text-gray-400"}`}
+    >
+      {children}
+    </span>
+  </li>
+);
+
 const HomePage = () => {
   const router = useRouter();
 
-  const navigateToForm = () => {
-    router.push("/form");
+  const navigateToFreePlan = () => {
+    router.push("/form/free");
+  };
+
+  const navigateToPremiumPlan = () => {
+    router.push("/form/premium");
   };
 
   return (
@@ -94,15 +130,14 @@ const HomePage = () => {
                 animate="visible"
               >
                 Crie uma linha do tempo única e interativa para celebrar seu
-                relacionamento por apenas R$15,00.
+                relacionamento. Teste gratuitamente hoje!
               </motion.p>
               <motion.div variants={fadeIn} initial="hidden" animate="visible">
-                <Button
-                  onClick={navigateToForm}
-                  className="bg-pink-600 text-white hover:bg-pink-500 text-lg px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-                >
-                  Comece Agora <ArrowRight className="ml-2" />
-                </Button>
+                <Link href="#plans">
+                  <Button className="bg-pink-600 text-white hover:bg-pink-500 text-lg px-8 py-3 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                    Comece Agora <ArrowRight className="ml-2" />
+                  </Button>
+                </Link>
               </motion.div>
             </div>
             <div className="md:w-1/3">
@@ -215,11 +250,11 @@ const HomePage = () => {
                 </div>
                 <div>
                   <h3 className="text-2xl font-semibold mb-2">
-                    3. Faça o pagamento único
+                    3. Escolha seu plano
                   </h3>
                   <p className="text-gray-300">
-                    Realize o pagamento de R$15,00 via Pix de forma segura para
-                    finalizar e publicar sua linha do tempo permanentemente.
+                    Opte pelo plano gratuito ou faça upgrade para o plano
+                    premium com mais recursos e duração de um ano.
                   </p>
                 </div>
               </motion.div>
@@ -232,11 +267,97 @@ const HomePage = () => {
                     4. Visualize e compartilhe
                   </h3>
                   <p className="text-gray-300">
-                    Após o pagamento, receba um QR code exclusivo com o link
-                    para sua linha do tempo, pronta para ser compartilhada com
-                    quem você ama.
+                    Receba um link exclusivo para sua linha do tempo, pronta
+                    para ser compartilhada com quem você ama.
                   </p>
                 </div>
+              </motion.div>
+            </div>
+          </div>
+        </AnimatedSection>
+      </section>
+
+      {/* Plans Section */}
+      <section
+        id="plans"
+        className="py-20 px-4 bg-gradient-to-b from-gray-800 to-gray-900"
+      >
+        <AnimatedSection>
+          <div className="max-w-7xl mx-auto">
+          <motion.h2
+              className="text-3xl font-bold mb-12 text-center text-pink-300"
+              variants={fadeIn}
+            >
+              Escolha seu plano
+            </motion.h2>
+            <div className="grid md:grid-cols-2 gap-8 items-start">
+              <motion.div variants={fadeIn} className="h-full">
+                <Card className="bg-gray-800 border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-pink-500/10 relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-pink-500/10 to-purple-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+                  <CardHeader className="bg-gradient-to-br from-pink-500 to-pink-600 p-6 relative z-10">
+                    <CardTitle className="text-2xl font-bold text-white flex items-center justify-between">
+                      Plano Gratuito
+                      <Heart className="w-6 h-6 text-white" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 relative z-10">
+                    <p className="text-4xl font-bold text-white mb-6">R$ 0</p>
+                    <ul className="space-y-4 mb-6">
+                      <PlanFeature included={true}>
+                        Até 3 lembranças
+                      </PlanFeature>
+                      <PlanFeature included={true}>
+                        Válido por 1 dia
+                      </PlanFeature>
+                      <PlanFeature included={true}>
+                        Perfeito para experimentar
+                      </PlanFeature>
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="bg-gray-800 p-6 relative z-10">
+                    <Button
+                      onClick={navigateToFreePlan}
+                      className="w-full bg-pink-600 text-white hover:bg-pink-500 transition-colors duration-300 group-hover:shadow-lg group-hover:shadow-pink-500/50"
+                    >
+                      Começar Grátis
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
+              <motion.div variants={fadeIn} className="h-full">
+                <Card className="bg-gray-800 border-gray-700 overflow-hidden transition-all duration-300 hover:shadow-xl hover:shadow-purple-500/10 relative group">
+                  <div className="absolute inset-0 bg-gradient-to-br from-purple-500/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+
+                  <CardHeader className="bg-gradient-to-br from-pink-500 to-pink-600 p-6 relative z-10">
+                    <CardTitle className="text-2xl font-bold text-white flex items-center justify-between">
+                      Plano Premium
+                      <Sparkles className="w-6 h-6 text-white" />
+                    </CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-6 relative z-10">
+                    <p className="text-4xl font-bold text-white mb-2">R$ 15</p>
+
+                    <ul className="space-y-4 mb-6">
+                      <PlanFeature included={true}>
+                        Até 10 lembranças
+                      </PlanFeature>
+                      <PlanFeature included={true}>Pagamento único</PlanFeature>
+                      <PlanFeature included={true}>
+                        Acesso por 1 ano
+                      </PlanFeature>
+                    </ul>
+                  </CardContent>
+                  <CardFooter className="bg-gray-800 p-6 relative z-10">
+                    <Button
+                      onClick={navigateToPremiumPlan}
+                      className="w-full bg-gradient-to-r from-purple-500 to-pink-500 text-white hover:from-purple-600 hover:to-pink-600 transition-all duration-300 group-hover:shadow-lg group-hover:shadow-purple-500/50"
+                    >
+                      Escolher Premium
+                      <ArrowRight className="ml-2 w-5 h-5" />
+                    </Button>
+                  </CardFooter>
+                </Card>
               </motion.div>
             </div>
           </div>
@@ -326,13 +447,13 @@ const HomePage = () => {
                 className="bg-gray-800 p-8 rounded-lg shadow-lg"
               >
                 <h3 className="text-2xl font-semibold mb-4 text-pink-300">
-                  Por quanto tempo minha linha do tempo ficará disponível?
+                  Qual a diferença entre os planos?
                 </h3>
                 <p className="text-gray-300">
-                  Sua linha do tempo ficará disponível permanentemente após o
-                  pagamento único. Não há custos adicionais ou assinaturas
-                  recorrentes. Sua história de amor estará sempre acessível para
-                  você e seus entes queridos revisitarem.
+                  O plano gratuito permite criar até 3 lembranças e é válido por
+                  1 dia, ideal para experimentar o serviço. O plano premium, por
+                  R$15,00, permite até 10 lembranças e é válido por 1 ano,
+                  oferecendo mais espaço para sua história de amor.
                 </p>
               </motion.div>
             </div>
@@ -351,16 +472,16 @@ const HomePage = () => {
               Pronto para Eternizar Sua História de Amor?
             </motion.h2>
             <motion.p className="text-xl mb-8 text-gray-300" variants={fadeIn}>
-              Crie sua linha do tempo personalizada hoje por apenas R$15,00 e
-              comece a celebrar cada momento especial do seu relacionamento.
+              Comece gratuitamente hoje ou escolha nosso plano premium por
+              apenas R$15,00 para celebrar cada momento especial do seu
+              relacionamento por um ano inteiro.
             </motion.p>
             <motion.div variants={fadeIn}>
-              <Button
-                onClick={navigateToForm}
-                className="bg-pink-600 text-white hover:bg-pink-500 text-lg px-10 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg"
-              >
-                Comece Sua Jornada <ArrowRight className="ml-2" />
-              </Button>
+              <Link href="#plans">
+                <Button className="bg-pink-600 text-white hover:bg-pink-500 text-lg px-10 py-4 rounded-full transition-all duration-300 transform hover:scale-105 shadow-lg">
+                  Comece Sua Jornada <ArrowRight className="ml-2" />
+                </Button>
+              </Link>
             </motion.div>
           </div>
         </AnimatedSection>

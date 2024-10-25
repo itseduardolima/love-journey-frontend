@@ -1,18 +1,16 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { Plus, Check, X } from "lucide-react";
+import { Plus,  X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
 import { CoupleData } from "@/types/CoupleData";
 import { Input } from "@/components/Input";
-import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
-import { DatePicker } from "@/components/DatePicker";
 import { StepIndicator } from "@/components/StepIndicator";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { MemoryFormFields } from "@/components/MemoryFormFields";
@@ -26,7 +24,7 @@ interface Memory {
   photoMimeType: string;
 }
 
-export default function PaidLoveJourneyForm() {
+export default function PremiumLoveJourneyForm() {
   const [step, setStep] = useState(0);
   const [coupleData, setCoupleData] = useState<CoupleData>({
     partner1: "",

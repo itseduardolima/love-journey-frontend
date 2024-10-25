@@ -1,18 +1,16 @@
 "use client";
 
 import React, { useState } from "react";
-import { Plus, Check, X } from "lucide-react";
+import { Plus, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { format, parse } from "date-fns";
+import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
 import { CoupleData } from "@/types/CoupleData";
 import { Input } from "@/components/Input";
-import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
-import { DatePicker } from "@/components/DatePicker";
 import { StepIndicator } from "@/components/StepIndicator";
 import { NavigationButtons } from "@/components/NavigationButtons";
 import { MemoryFormFields } from "@/components/MemoryFormFields";
@@ -224,7 +222,6 @@ export default function FreeLoveJourneyForm() {
     createJourneyMutation.mutate(coupleData);
   };
 
- 
   const renderForm = () => {
     switch (step) {
       case 0:
@@ -322,7 +319,7 @@ export default function FreeLoveJourneyForm() {
                 </div>
               </div>
             ))}
-           {showMemoryForm && (
+            {showMemoryForm && (
               <div className="space-y-4 bg-gray-700 p-4 rounded-lg">
                 <h3 className="text-xl font-semibold text-pink-300 mb-4">
                   {editingMemoryId ? "Editar Lembrança" : "Nova Lembrança"}
