@@ -1,14 +1,9 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { ArrowRight, ArrowLeft, Plus, Check, X } from "lucide-react";
+import { Plus, Check, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
-import {
-  QueryClient,
-  QueryClientProvider,
-  useMutation,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format, parse } from "date-fns";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import { api } from "@/services/api";
@@ -18,6 +13,9 @@ import { Input } from "@/components/Input";
 import { TextArea } from "@/components/TextArea";
 import { Button } from "@/components/Button";
 import { DatePicker } from "@/components/DatePicker";
+import { StepIndicator } from "@/components/StepIndicator";
+import { NavigationButtons } from "@/components/NavigationButtons";
+import { MemoryFormFields } from "@/components/MemoryFormFields";
 
 interface Memory {
   id: string;
@@ -28,7 +26,7 @@ interface Memory {
   photoMimeType: string;
 }
 
-function LoveStoryForm() {
+export default function PaidLoveJourneyForm() {
   const [step, setStep] = useState(0);
   const [coupleData, setCoupleData] = useState<CoupleData>({
     partner1: "",
@@ -249,88 +247,6 @@ function LoveStoryForm() {
     createJourneyMutation.mutate(coupleData);
   };
 
-  const renderMemoryForm = () => (
-    <div className="space-y-4 bg-gray-700 p-4 rounded-lg">
-      <h3 className="text-xl font-semibold text-pink-300 mb-4">
-        {editingMemoryId ? "Editar Lembrança" : "Nova Lembrança"}
-      </h3>
-      <div className="relative">
-        <input
-          type="file"
-          accept="image/*"
-          onChange={handlePhotoChange}
-          className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
-        />
-        <div className="w-full p-3 bg-gray-600 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all flex items-center justify-center">
-          {currentMemory.photo ? (
-            <Check className="mr-2" size={20} />
-          ) : (
-            <Plus className="mr-2" size={20} />
-          )}
-          {currentMemory.photo ? "Foto selecionada" : "Adicionar foto"}
-        </div>
-        {errors.photo && (
-          <p className="text-red-500 text-sm mt-1">{errors.photo}</p>
-        )}
-      </div>
-      <div>
-        <DatePicker
-          date={
-            currentMemory.date
-              ? parse(currentMemory.date, "dd/MM/yyyy", new Date())
-              : undefined
-          }
-          onDateChange={handleDateChange}
-          placeholder="Selecione uma data"
-        />
-        {errors.date && (
-          <p className="text-red-500 text-sm mt-1">{errors.date}</p>
-        )}
-      </div>
-      <div>
-        <label>Título</label>
-        <Input
-          type="text"
-          name="title"
-          value={currentMemory.title}
-          onChange={handleInputChange}
-          placeholder="Ex: Primeiro beijo"
-        />
-        {errors.title && (
-          <p className="text-red-500 text-sm mt-1">{errors.title}</p>
-        )}
-      </div>
-      <div>
-        <label>Descrição</label>
-        <TextArea
-          name="description"
-          value={currentMemory.description}
-          onChange={handleInputChange}
-          placeholder="Ex: Senti meu coração acelerar quando..."
-        />
-        {errors.description && (
-          <p className="text-red-500 text-sm mt-1">{errors.description}</p>
-        )}
-      </div>
-
-      <div className="flex justify-end space-x-2 mt-4">
-        <Button
-          onClick={() => setShowMemoryForm(false)}
-          variant="default"
-          label="Cancelar"
-        />
-        <Button
-          onClick={handleAddMemory}
-          label={editingMemoryId ? "Salvar Alterações" : "Salvar"}
-          variant="primary"
-        />
-      </div>
-      {errors.memory && (
-        <p className="text-red-500 text-sm mt-2">{errors.memory}</p>
-      )}
-    </div>
-  );
-
   const renderForm = () => {
     switch (step) {
       case 0:
@@ -428,7 +344,32 @@ function LoveStoryForm() {
                 </div>
               </div>
             ))}
-            {showMemoryForm && renderMemoryForm()}
+            {showMemoryForm && (
+              <div className="space-y-4 bg-gray-700 p-4 rounded-lg">
+                <h3 className="text-xl font-semibold text-pink-300 mb-4">
+                  {editingMemoryId ? "Editar Lembrança" : "Nova Lembrança"}
+                </h3>
+                <MemoryFormFields
+                  currentMemory={currentMemory}
+                  errors={errors}
+                  handleInputChange={handleInputChange}
+                  handleDateChange={handleDateChange}
+                  handlePhotoChange={handlePhotoChange}
+                />
+                <div className="flex justify-end space-x-2 mt-4">
+                  <Button
+                    onClick={() => setShowMemoryForm(false)}
+                    variant="default"
+                    label="Cancelar"
+                  />
+                  <Button
+                    onClick={handleAddMemory}
+                    label={editingMemoryId ? "Salvar Alterações" : "Salvar"}
+                    variant="primary"
+                  />
+                </div>
+              </div>
+            )}
             {memories.length >= 3 && memories.length <= 10 && (
               <div className="flex justify-end mt-6">
                 <Button
@@ -477,34 +418,7 @@ function LoveStoryForm() {
   return (
     <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
       <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-        <div className="mb-6">
-          <div className="flex justify-between items-center mb-2">
-            {Array.from({ length: totalSteps }).map((_, index) => (
-              <div
-                key={index}
-                className={`w-8 h-8 rounded-full flex items-center justify-center ${
-                  index < step
-                    ? "bg-pink-500"
-                    : index === step
-                    ? "bg-pink-300"
-                    : "bg-gray-600"
-                }`}
-              >
-                {index < step ? (
-                  <Check size={16} />
-                ) : (
-                  <span className="text-sm">{index + 1}</span>
-                )}
-              </div>
-            ))}
-          </div>
-          <div className="h-2 bg-gray-600 rounded-full">
-            <div
-              className="h-full bg-pink-500 rounded-full transition-all duration-300 ease-in-out"
-              style={{ width: `${(step / (totalSteps - 1)) * 100}%` }}
-            ></div>
-          </div>
-        </div>
+        <StepIndicator totalSteps={totalSteps} currentStep={step} />
         {renderForm()}
         {errors.general && (
           <div className="mt-4 p-3 bg-red-500 text-white rounded-lg flex items-center">
@@ -512,37 +426,14 @@ function LoveStoryForm() {
           </div>
         )}
         {step < 3 && (
-          <div className="mt-6 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 sm:space-x-4">
-            {step > 0 && (
-              <Button
-                label="Voltar"
-                onClick={handleBack}
-                variant="default"
-                icon={<ArrowLeft size={20} />}
-                disabled={step === 0}
-              />
-            )}
-            <Button
-              label="Próximo"
-              onClick={handleNext}
-              disabled={isNextDisabled}
-              variant="primary"
-              icon={<ArrowRight size={20} />}
-              iconPosition="right"
-            />
-          </div>
+          <NavigationButtons
+            step={step}
+            isNextDisabled={isNextDisabled}
+            onBack={handleBack}
+            onNext={handleNext}
+          />
         )}
       </div>
     </div>
-  );
-}
-
-export default function Component() {
-  const queryClient = new QueryClient();
-
-  return (
-    <QueryClientProvider client={queryClient}>
-      <LoveStoryForm />
-    </QueryClientProvider>
   );
 }
