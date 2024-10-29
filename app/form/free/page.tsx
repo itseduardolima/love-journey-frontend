@@ -68,10 +68,10 @@ export default function FreeLoveJourneyForm() {
       queryClient.setQueryData(["journey", data.id], data);
       createMemories(data.id);
     },
-    onError: (error: any) => {
-      console.error("API Error:", error);
+    onError: () => {
       setErrors({
-        general: error.response?.data?.message || "Ocorreu um erro ao salvar sua jornada. Por favor, tente novamente.",
+        general:
+          "Ocorreu um erro ao salvar sua jornada. Por favor, tente novamente.",
       });
     },
   });
@@ -91,10 +91,10 @@ export default function FreeLoveJourneyForm() {
       });
       return response.data;
     },
-    onError: (error: any) => {
-      console.error("Memory Creation Error:", error);
+    onError: () => {
       setErrors({
-        general: "Ocorreu um erro ao salvar uma memória. Por favor, tente novamente.",
+        general:
+          "Ocorreu um erro ao salvar uma memória. Por favor, tente novamente.",
       });
     },
   });
@@ -123,7 +123,8 @@ export default function FreeLoveJourneyForm() {
       if (showMemoryForm) {
         if (!currentMemory.date) newErrors.date = "Campo obrigatório";
         if (!currentMemory.title) newErrors.title = "Campo obrigatório";
-        if (!currentMemory.description) newErrors.description = "Campo obrigatório";
+        if (!currentMemory.description)
+          newErrors.description = "Campo obrigatório";
         if (!currentMemory.photo) newErrors.photo = "Campo obrigatório";
         isValid = Object.keys(newErrors).length === 0;
       } else {
