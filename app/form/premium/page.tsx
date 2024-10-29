@@ -30,6 +30,7 @@ export default function PremiumLoveJourneyForm() {
     partner1: "",
     partner2: "",
     title: "",
+    isPaid: true,
   });
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentMemory, setCurrentMemory] = useState<Memory>({

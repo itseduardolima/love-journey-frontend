@@ -33,6 +33,7 @@ import { useRouter } from "next/navigation";
 import TimelineExample from "@/components/TimeLineExample";
 import { mockTimelineData } from "@/mock/data";
 import Link from "next/link";
+import HowItWorks from "@/components/HowItWorks";
 
 const fadeIn = {
   hidden: { opacity: 0, y: 50 },
@@ -205,77 +206,7 @@ const HomePage = () => {
       </section>
 
       {/* How it Works */}
-      <section className="py-20 px-4">
-        <AnimatedSection>
-          <div className="max-w-5xl mx-auto">
-            <motion.h2
-              className="text-3xl font-bold mb-12 text-center text-pink-300"
-              variants={fadeIn}
-            >
-              Como Funciona
-            </motion.h2>
-            <div className="grid md:grid-cols-2 gap-8">
-              <motion.div className="flex items-start" variants={fadeIn}>
-                <div className="bg-pink-600 rounded-full p-3 mr-4 flex-shrink-0">
-                  <Users className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    1. Preencha seus dados
-                  </h3>
-                  <p className="text-gray-300">
-                    Insira seu nome e o nome de sua parceira ou parceiro para
-                    personalizar sua jornada de amor única.
-                  </p>
-                </div>
-              </motion.div>
-              <motion.div className="flex items-start" variants={fadeIn}>
-                <div className="bg-pink-600 rounded-full p-3 mr-4 flex-shrink-0">
-                  <Clock className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    2. Adicione momentos especiais
-                  </h3>
-                  <p className="text-gray-300">
-                    Insira datas, fotos e mensagens para cada momento marcante
-                    do seu relacionamento, criando uma narrativa visual
-                    emocionante.
-                  </p>
-                </div>
-              </motion.div>
-              <motion.div className="flex items-start" variants={fadeIn}>
-                <div className="bg-pink-600 rounded-full p-3 mr-4 flex-shrink-0">
-                  <CreditCard className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    3. Escolha seu plano
-                  </h3>
-                  <p className="text-gray-300">
-                    Opte pelo plano gratuito ou faça upgrade para o plano
-                    premium com mais recursos e duração de um ano.
-                  </p>
-                </div>
-              </motion.div>
-              <motion.div className="flex items-start" variants={fadeIn}>
-                <div className="bg-pink-600 rounded-full p-3 mr-4 flex-shrink-0">
-                  <QrCode className="w-8 h-8" />
-                </div>
-                <div>
-                  <h3 className="text-2xl font-semibold mb-2">
-                    4. Visualize e compartilhe
-                  </h3>
-                  <p className="text-gray-300">
-                    Receba um link exclusivo para sua linha do tempo, pronta
-                    para ser compartilhada com quem você ama.
-                  </p>
-                </div>
-              </motion.div>
-            </div>
-          </div>
-        </AnimatedSection>
-      </section>
+      <HowItWorks />
 
       {/* Plans Section */}
       <section
@@ -344,7 +275,7 @@ const HomePage = () => {
                       </PlanFeature>
                       <PlanFeature included={true}>Pagamento único</PlanFeature>
                       <PlanFeature included={true}>
-                        Acesso por 1 ano
+                        Acesso por 1 mês
                       </PlanFeature>
                     </ul>
                   </CardContent>
@@ -408,7 +339,7 @@ const HomePage = () => {
                   Como é feito o pagamento?
                 </h3>
                 <p className="text-gray-300">
-                  O pagamento de R$15,00 é realizado de forma segura via Pix.
+                  O pagamento de R$15,00 é realizado de forma segura via Mercado Pago com as opções de Pix ou Cartão de crédito.
                   Após criar sua linha do tempo, você receberá instruções
                   detalhadas para efetuar o pagamento de maneira rápida e
                   conveniente.
@@ -452,7 +383,7 @@ const HomePage = () => {
                 <p className="text-gray-300">
                   O plano gratuito permite criar até 3 lembranças e é válido por
                   1 dia, ideal para experimentar o serviço. O plano premium, por
-                  R$15,00, permite até 10 lembranças e é válido por 1 ano,
+                  R$15,00, permite até 10 lembranças e é válido por 1 mês,
                   oferecendo mais espaço para sua história de amor.
                 </p>
               </motion.div>

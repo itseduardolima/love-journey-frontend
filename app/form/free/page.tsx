@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
@@ -8,7 +8,6 @@ import { format } from "date-fns";
 import { useRouter } from "next/navigation";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
-import { CoupleData } from "@/types/CoupleData";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { StepIndicator } from "@/components/StepIndicator";
@@ -24,13 +23,22 @@ interface Memory {
   photoMimeType: string;
 }
 
+interface CoupleData {
+  partner1: string;
+  partner2: string;
+  title: string;
+  isPaid: boolean;
+}
+
 export default function FreeLoveJourneyForm() {
   const [step, setStep] = useState(0);
   const [coupleData, setCoupleData] = useState<CoupleData>({
     partner1: "",
     partner2: "",
     title: "",
+    isPaid: false,
   });
+
   const [memories, setMemories] = useState<Memory[]>([]);
   const [currentMemory, setCurrentMemory] = useState<Memory>({
     id: "",
@@ -51,17 +59,19 @@ export default function FreeLoveJourneyForm() {
 
   const createJourneyMutation = useMutation({
     mutationFn: async (data: CoupleData) => {
+      console.log("Sending data to API:", data); // Log the data being sent
       const response = await api.post("/journey", data);
+      console.log("API Response:", response.data);
       return response.data;
     },
     onSuccess: (data) => {
       queryClient.setQueryData(["journey", data.id], data);
       createMemories(data.id);
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("API Error:", error);
       setErrors({
-        general:
-          "Ocorreu um erro ao salvar sua jornada. Por favor, tente novamente.",
+        general: error.response?.data?.message || "Ocorreu um erro ao salvar sua jornada. Por favor, tente novamente.",
       });
     },
   });
@@ -81,10 +91,10 @@ export default function FreeLoveJourneyForm() {
       });
       return response.data;
     },
-    onError: () => {
+    onError: (error: any) => {
+      console.error("Memory Creation Error:", error);
       setErrors({
-        general:
-          "Ocorreu um erro ao salvar uma memória. Por favor, tente novamente.",
+        general: "Ocorreu um erro ao salvar uma memória. Por favor, tente novamente.",
       });
     },
   });
@@ -113,8 +123,7 @@ export default function FreeLoveJourneyForm() {
       if (showMemoryForm) {
         if (!currentMemory.date) newErrors.date = "Campo obrigatório";
         if (!currentMemory.title) newErrors.title = "Campo obrigatório";
-        if (!currentMemory.description)
-          newErrors.description = "Campo obrigatório";
+        if (!currentMemory.description) newErrors.description = "Campo obrigatório";
         if (!currentMemory.photo) newErrors.photo = "Campo obrigatório";
         isValid = Object.keys(newErrors).length === 0;
       } else {
@@ -219,8 +228,15 @@ export default function FreeLoveJourneyForm() {
       });
       return;
     }
-    createJourneyMutation.mutate(coupleData);
+    // Ensure isPaid is set to false before submitting
+    const submissionData = { ...coupleData, isPaid: false };
+    console.log("Submitting data:", submissionData); // Log the data being submitted
+    createJourneyMutation.mutate(submissionData);
   };
+
+  useEffect(() => {
+    validateStep();
+  }, [step, coupleData, currentMemory, memories, showMemoryForm]);
 
   const renderForm = () => {
     switch (step) {
