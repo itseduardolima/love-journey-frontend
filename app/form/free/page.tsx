@@ -59,9 +59,7 @@ export default function FreeLoveJourneyForm() {
 
   const createJourneyMutation = useMutation({
     mutationFn: async (data: CoupleData) => {
-      console.log("Sending data to API:", data); // Log the data being sent
       const response = await api.post("/journey", data);
-      console.log("API Response:", response.data);
       return response.data;
     },
     onSuccess: (data) => {
@@ -229,10 +227,7 @@ export default function FreeLoveJourneyForm() {
       });
       return;
     }
-    // Ensure isPaid is set to false before submitting
-    const submissionData = { ...coupleData, isPaid: false };
-    console.log("Submitting data:", submissionData); // Log the data being submitted
-    createJourneyMutation.mutate(submissionData);
+    createJourneyMutation.mutate(coupleData);
   };
 
   useEffect(() => {
