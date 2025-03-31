@@ -12,8 +12,8 @@ export const mockTimelineData: TimelineExampleProps[] = [
   {
     id: "sofia-miguel",
     imageSrc: timeline1Image,
-    coupleName: "Sofia e Miguel",
-    link: "https://lovejourney.vercel.app/journey/16cff07c-08d2-4ed3-a063-5b0a2aa45dc3",
+    coupleName: "Camila e Thiago",
+    link: "https://lovejourney.vercel.app/journey/29191c16-026b-4a57-90ed-2288d666d968",
   },
   {
     id: "ana-pedro",
