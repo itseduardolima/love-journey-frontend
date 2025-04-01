@@ -38,7 +38,7 @@ export function MemoryFormFields({
           onChange={handlePhotoChange}
           className="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
         />
-        <div className="w-full p-3 bg-gray-600 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all flex items-center justify-center">
+        <div className="w-full p-3 bg-secondary border border-gray-500 text-white rounded-2xl focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all flex items-center justify-center">
           {currentMemory.photo ? (
             <Check className="mr-2" size={20} />
           ) : (

@@ -1,14 +1,14 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { Plus,  X } from "lucide-react";
+import type React from "react";
+import { useState, useEffect } from "react";
+import { Plus, X } from "lucide-react";
 import { v4 as uuidv4 } from "uuid";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { format } from "date-fns";
 import { initMercadoPago } from "@mercadopago/sdk-react";
 import { api } from "@/services/api";
 import { Loader } from "@/components/Loader";
-import { CoupleData } from "@/types/CoupleData";
 import { Input } from "@/components/Input";
 import { Button } from "@/components/Button";
 import { StepIndicator } from "@/components/StepIndicator";
@@ -22,6 +22,13 @@ interface Memory {
   description: string;
   photo: File | null;
   photoMimeType: string;
+}
+
+interface CoupleData {
+  partner1: string;
+  partner2: string;
+  title: string;
+  isPaid: boolean;
 }
 
 export default function PremiumLoveJourneyForm() {
@@ -46,6 +53,11 @@ export default function PremiumLoveJourneyForm() {
   const [editingMemoryId, setEditingMemoryId] = useState<string | null>(null);
   const [showMemoryForm, setShowMemoryForm] = useState(false);
   const [preferenceId, setPreferenceId] = useState<string | null>(null);
+  const [formTouched, setFormTouched] = useState(false);
+  const [fieldsTouched, setFieldsTouched] = useState<{
+    [key: string]: boolean;
+  }>({});
+
   const queryClient = useQueryClient();
 
   const totalSteps = 5;
@@ -127,20 +139,32 @@ export default function PremiumLoveJourneyForm() {
     if (step < 3) {
       if (step === 0 && (!coupleData.partner1 || !coupleData.partner2)) {
         isValid = false;
-        if (!coupleData.partner1) newErrors.partner1 = "Campo obrigatório";
-        if (!coupleData.partner2) newErrors.partner2 = "Campo obrigatório";
+        if (!coupleData.partner1 && fieldsTouched.partner1)
+          newErrors.partner1 = "Campo obrigatório";
+        if (!coupleData.partner2 && fieldsTouched.partner2)
+          newErrors.partner2 = "Campo obrigatório";
       } else if (step === 1 && !coupleData.title) {
         isValid = false;
-        newErrors.title = "Campo obrigatório";
+        if (fieldsTouched.title) newErrors.title = "Campo obrigatório";
       }
     } else if (step === 3) {
       if (showMemoryForm) {
-        if (!currentMemory.date) newErrors.date = "Campo obrigatório";
-        if (!currentMemory.title) newErrors.title = "Campo obrigatório";
-        if (!currentMemory.description)
+        if (!currentMemory.date && fieldsTouched.date)
+          newErrors.date = "Campo obrigatório";
+        if (!currentMemory.title && fieldsTouched.title)
+          newErrors.title = "Campo obrigatório";
+        if (!currentMemory.description && fieldsTouched.description)
           newErrors.description = "Campo obrigatório";
-        if (!currentMemory.photo) newErrors.photo = "Campo obrigatório";
-        isValid = Object.keys(newErrors).length === 0;
+        if (!currentMemory.photo && fieldsTouched.photo)
+          newErrors.photo = "Campo obrigatório";
+
+        // Verificar se todos os campos necessários estão preenchidos
+        isValid = Boolean(
+          currentMemory.date &&
+            currentMemory.title &&
+            currentMemory.description &&
+            currentMemory.photo
+        );
       } else {
         isValid = memories.length >= 3 && memories.length <= 10;
       }
@@ -154,6 +178,13 @@ export default function PremiumLoveJourneyForm() {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { name, value } = e.target;
+
+    // Marcar o campo como tocado
+    setFieldsTouched((prev) => ({
+      ...prev,
+      [name]: true,
+    }));
+
     if (step < 3) {
       setCoupleData((prev) => ({ ...prev, [name]: value }));
     } else {
@@ -163,12 +194,22 @@ export default function PremiumLoveJourneyForm() {
   };
 
   const handleDateChange = (date: Date | undefined) => {
+    setFieldsTouched((prev) => ({
+      ...prev,
+      date: true,
+    }));
+
     const formattedDate = date ? format(date, "dd/MM/yyyy") : "";
     setCurrentMemory((prev) => ({ ...prev, date: formattedDate }));
     validateStep();
   };
 
   const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setFieldsTouched((prev) => ({
+      ...prev,
+      photo: true,
+    }));
+
     const file = e.target.files?.[0];
     if (file) {
       setCurrentMemory((prev) => ({
@@ -181,6 +222,14 @@ export default function PremiumLoveJourneyForm() {
   };
 
   const handleAddMemory = () => {
+    // Marcar todos os campos como tocados ao tentar adicionar
+    setFieldsTouched({
+      date: true,
+      title: true,
+      description: true,
+      photo: true,
+    });
+
     if (
       currentMemory.date &&
       currentMemory.title &&
@@ -203,6 +252,10 @@ export default function PremiumLoveJourneyForm() {
       });
       setEditingMemoryId(null);
       setShowMemoryForm(false);
+
+      // Resetar os campos tocados após adicionar com sucesso
+      setFieldsTouched({});
+
       validateStep();
     } else {
       setErrors({
@@ -223,20 +276,48 @@ export default function PremiumLoveJourneyForm() {
       setCurrentMemory(memoryToEdit);
       setEditingMemoryId(id);
       setShowMemoryForm(true);
+
+      // Resetar os campos tocados ao editar
+      setFieldsTouched({});
     }
   };
 
   const handleNext = () => {
+    // Marcar o formulário como tocado ao tentar avançar
+    setFormTouched(true);
+
+    // Marcar todos os campos relevantes como tocados
+    if (step === 0) {
+      setFieldsTouched({
+        ...fieldsTouched,
+        partner1: true,
+        partner2: true,
+      });
+    } else if (step === 1) {
+      setFieldsTouched({
+        ...fieldsTouched,
+        title: true,
+      });
+    }
+
+    validateStep();
+
     if (!isNextDisabled) {
       setStep((prev) => prev + 1);
+      // Resetar os campos tocados ao avançar para o próximo passo
+      setFieldsTouched({});
     }
   };
 
   const handleBack = () => {
     setStep((prev) => prev - 1);
+    // Resetar os erros ao voltar
+    setErrors({});
   };
 
   const handleSubmit = () => {
+    setFormTouched(true);
+
     if (memories.length < 3 || memories.length > 10) {
       setErrors({
         general: "Adicione entre 3 e 10 lembranças antes de finalizar.",
@@ -246,12 +327,27 @@ export default function PremiumLoveJourneyForm() {
     createJourneyMutation.mutate(coupleData);
   };
 
+  useEffect(() => {
+    // Só validar se o formulário já foi tocado ou se estamos em um passo avançado
+    if (formTouched || step > 0 || Object.keys(fieldsTouched).length > 0) {
+      validateStep();
+    }
+  }, [
+    step,
+    coupleData,
+    currentMemory,
+    memories,
+    showMemoryForm,
+    formTouched,
+    fieldsTouched,
+  ]);
+
   const renderForm = () => {
     switch (step) {
       case 0:
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-pink-300 mb-4">
+            <h2 className="text-2xl font-bold text-primary mb-4">
               Bem-vindo! Vamos começar com os nomes.
             </h2>
             <div>
@@ -263,7 +359,9 @@ export default function PremiumLoveJourneyForm() {
                 placeholder="Nome do Parceiro 1"
               />
               {errors.partner1 && (
-                <p className="text-red-500 text-sm mt-1">{errors.partner1}</p>
+                <p className="text-destructive text-sm mt-1">
+                  {errors.partner1}
+                </p>
               )}
             </div>
             <div>
@@ -275,7 +373,9 @@ export default function PremiumLoveJourneyForm() {
                 placeholder="Nome do Parceiro 2"
               />
               {errors.partner2 && (
-                <p className="text-red-500 text-sm mt-1">{errors.partner2}</p>
+                <p className="text-destructive text-sm mt-1">
+                  {errors.partner2}
+                </p>
               )}
             </div>
           </div>
@@ -283,7 +383,7 @@ export default function PremiumLoveJourneyForm() {
       case 1:
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-pink-300 mb-4">
+            <h2 className="text-2xl font-bold text-primary mb-4">
               Qual é o título da história do casal?
             </h2>
             <div>
@@ -295,7 +395,7 @@ export default function PremiumLoveJourneyForm() {
                 placeholder="Ex: Nossa História de Amor"
               />
               {errors.title && (
-                <p className="text-red-500 text-sm mt-1">{errors.title}</p>
+                <p className="text-destructive text-sm mt-1">{errors.title}</p>
               )}
             </div>
           </div>
@@ -303,7 +403,7 @@ export default function PremiumLoveJourneyForm() {
       case 2:
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-pink-300 mb-4">
+            <h2 className="text-2xl font-bold text-primary mb-4">
               Agora, vamos adicionar lembranças especiais!
             </h2>
             <p className="text-gray-300">
@@ -315,7 +415,7 @@ export default function PremiumLoveJourneyForm() {
         return (
           <div className="space-y-4">
             <div className="flex flex-col gap-5 mb-4">
-              <h2 className="text-2xl font-bold  text-pink-300">Lembranças</h2>
+              <h2 className="text-2xl font-bold text-primary">Lembranças</h2>
               {memories.length < 10 && (
                 <Button
                   label="Adicionar lembrança"
@@ -329,14 +429,16 @@ export default function PremiumLoveJourneyForm() {
               <div
                 onClick={() => handleEditMemory(memory.id)}
                 key={memory.id}
-                className="bg-gray-700 p-4 rounded-lg flex justify-between items-center"
+                className="bg-secondary border border-gray-500 p-4 rounded-2xl flex justify-between items-center cursor-pointer hover:bg-secondary/80 transition-colors"
               >
-                <h3 className="text-lg font-semibold text-pink-300 truncate flex-grow mr-4">
+                <h3 className="text-lg font-semibold text-primary-light truncate flex-grow mr-4">
                   {memory.title}
                 </h3>
                 <div>
                   <Button
-                    onClick={() => handleDeleteMemory(memory.id)}
+                    onClick={() => {
+                      handleDeleteMemory(memory.id);
+                    }}
                     variant="delete"
                     icon={<X size={20} />}
                   />
@@ -344,8 +446,8 @@ export default function PremiumLoveJourneyForm() {
               </div>
             ))}
             {showMemoryForm && (
-              <div className="space-y-4 bg-gray-700 p-4 rounded-lg">
-                <h3 className="text-xl font-semibold text-pink-300 mb-4">
+              <div className="space-y-4 bg-secondary p-4 rounded-lg border border-gray-500">
+                <h3 className="text-xl font-semibold text-primary mb-4">
                   {editingMemoryId ? "Editar Lembrança" : "Nova Lembrança"}
                 </h3>
                 <MemoryFormFields
@@ -357,7 +459,11 @@ export default function PremiumLoveJourneyForm() {
                 />
                 <div className="flex justify-end space-x-2 mt-4">
                   <Button
-                    onClick={() => setShowMemoryForm(false)}
+                    onClick={() => {
+                      setShowMemoryForm(false);
+                      setFieldsTouched({});
+                      setErrors({});
+                    }}
                     variant="default"
                     label="Cancelar"
                   />
@@ -369,6 +475,7 @@ export default function PremiumLoveJourneyForm() {
                 </div>
               </div>
             )}
+
             {memories.length >= 3 && memories.length <= 10 && (
               <div className="flex justify-end mt-6">
                 <Button
@@ -383,7 +490,7 @@ export default function PremiumLoveJourneyForm() {
       case 4:
         return (
           <div className="space-y-4">
-            <h2 className="text-2xl font-bold text-pink-300 mb-4">Pagamento</h2>
+            <h2 className="text-2xl font-bold text-primary mb-4">Pagamento</h2>
 
             <p className="text-gray-300 mb-4">
               Para visualizar sua linha do tempo, por favor realize o pagamento.
@@ -415,12 +522,12 @@ export default function PremiumLoveJourneyForm() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
+    <div className="min-h-screen bg-secondary-dark text-gray-100 flex items-center justify-center p-4">
+      <div className="bg-secondary p-8 rounded-lg shadow-xl max-w-md w-full">
         <StepIndicator totalSteps={totalSteps} currentStep={step} />
         {renderForm()}
         {errors.general && (
-          <div className="mt-4 p-3 bg-red-500 text-white rounded-lg flex items-center">
+          <div className="mt-4 p-3 bg-destructive text-white rounded-lg flex items-center">
             <p>{errors.general}</p>
           </div>
         )}

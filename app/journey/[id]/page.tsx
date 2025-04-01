@@ -10,7 +10,6 @@ import {
 } from "@tanstack/react-query";
 import React, { useRef } from "react";
 import { api } from "@/services/api";
-import { Journey } from "@/types/Journey";
 import { iconMap } from "@/lib/utils";
 import { ErrorPage } from "@/components/ErrorPage";
 import { TimelineNotFound } from "@/components/TimelineNotFound";
@@ -27,6 +26,14 @@ interface Memory {
     type: string;
   };
   photoMimeType: string;
+}
+
+interface Journey {
+  id: string;
+  title: string;
+  partner1: string;
+  partner2: string;
+  memories: Memory[];
 }
 
 function JourneyPage() {
@@ -62,7 +69,7 @@ function JourneyPage() {
       const imageUrl = URL.createObjectURL(blob);
       return (
         <img
-          src={imageUrl}
+          src={imageUrl || "/placeholder.svg"}
           alt={memory.title}
           className="w-full h-[500px] object-cover"
           onLoad={() => URL.revokeObjectURL(imageUrl)}
@@ -77,22 +84,19 @@ function JourneyPage() {
   );
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100" ref={containerRef}>
+    <div
+      className="min-h-screen bg-secondary-dark text-gray-100"
+      ref={containerRef}
+    >
       {/* Hero Section */}
-      <div className="relative overflow-hidden py-20 sm:py-32">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 1 }}
-          className="absolute inset-0 bg-gradient-to-b from-pink-500/20 to-gray-900/80"
-        ></motion.div>
+      <div className="relative overflow-hidden pt-20">
         <div className="container mx-auto px-4 relative z-10">
           <div className="max-w-4xl mx-auto text-center">
             <motion.h1
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               transition={{ duration: 0.8 }}
-              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-extrabold mb-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600"
+              className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold h-28 mb-6  bg-clip-text text-transparent bg-gradient-primary"
             >
               {journey.title}
             </motion.h1>
@@ -114,7 +118,7 @@ function JourneyPage() {
                 damping: 20,
               }}
             >
-              <Heart className="w-12 h-12 mx-auto text-pink-500" />
+              <Heart className="w-12 h-12 mx-auto text-primary" />
             </motion.div>
           </div>
         </div>
@@ -126,12 +130,12 @@ function JourneyPage() {
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
-          className="text-3xl md:text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600"
+          className="text-3xl md:text-4xl font-bold text-center mb-16 bg-clip-text text-transparent bg-gradient-primary"
         >
           Nossa Linha do Tempo
         </motion.h2>
         <div className="max-w-6xl mx-auto relative">
-          <motion.div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-to-b from-pink-500 to-purple-600" />
+          <motion.div className="absolute left-4 md:left-1/2 top-0 bottom-0 w-0.5 bg-gradient-primary" />
           {sortedMemories.map((memory, index) => (
             <motion.div
               key={memory.id}
@@ -153,13 +157,13 @@ function JourneyPage() {
                 </div>
                 <div className="w-full md:w-5/6 pl-12 md:pl-0">
                   <div className="flex items-center mb-4">
-                    <motion.div className="w-8 h-8 bg-pink-500 rounded-full border-4 border-gray-900 z-10 absolute left-0 md:left-1/2 transform md:-translate-x-1/2 flex items-center justify-center">
+                    <motion.div className="w-8 h-8 bg-primary rounded-full border-4 border-secondary-dark z-10 absolute left-0 md:left-1/2 transform md:-translate-x-1/2 flex items-center justify-center">
                       {React.createElement(iconMap[index % iconMap.length], {
                         className: "w-4 h-4 text-white",
                       })}
                     </motion.div>
                     <div
-                      className={`hidden md:block absolute top-4 w-8 h-0.5 bg-pink-500 ${
+                      className={`hidden md:block absolute top-4 w-8 h-0.5 bg-primary ${
                         index % 2 === 0 ? "-right-8" : "-left-8"
                       }`}
                     ></div>
@@ -170,8 +174,8 @@ function JourneyPage() {
                     }`}
                   >
                     <div className="flex items-center mb-2">
-                      <Calendar className="w-5 h-5 text-pink-500 mr-2" />
-                      <span className="text-xl font-semibold text-pink-400">
+                      <Calendar className="w-5 h-5 text-primary mr-2" />
+                      <span className="text-xl font-semibold text-primary-light">
                         {formatDate(memory.date)}
                       </span>
                     </div>
@@ -187,27 +191,6 @@ function JourneyPage() {
             </motion.div>
           ))}
         </div>
-      </div>
-
-      {/* Love You Section */}
-      <div className="text-center py-20 sm:py-32 bg-gradient-to-b from-gray-900 to-gray-800">
-        <motion.div
-          initial={{ scale: 0 }}
-          whileInView={{ scale: 1 }}
-          viewport={{ once: true }}
-          transition={{ type: "spring", stiffness: 260, damping: 20 }}
-        >
-          <Heart className="w-16 h-16 sm:w-24 sm:h-24 mx-auto text-pink-500 fill-current" />
-        </motion.div>
-        <motion.p
-          initial={{ opacity: 0 }}
-          whileInView={{ opacity: 1 }}
-          viewport={{ once: true }}
-          transition={{ delay: 0.5 }}
-          className="text-2xl text-love sm:text-3xl md:text-4xl font-bold mt-6 bg-clip-text text-transparent bg-gradient-to-r from-pink-500 to-purple-600"
-        >
-          Te amo!
-        </motion.p>
       </div>
     </div>
   );

@@ -14,9 +14,9 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
             key={index}
             className={`w-8 h-8 rounded-full flex items-center justify-center ${
               index < currentStep
-                ? "bg-pink-500"
+                ? "bg-primary"
                 : index === currentStep
-                ? "bg-pink-300"
+                ? "bg-primary-light"
                 : "bg-gray-600"
             }`}
           >
@@ -30,7 +30,7 @@ export function StepIndicator({ totalSteps, currentStep }: StepIndicatorProps) {
       </div>
       <div className="h-2 bg-gray-600 rounded-full">
         <div
-          className="h-full bg-pink-500 rounded-full transition-all duration-300 ease-in-out"
+          className="h-full bg-primary rounded-full transition-all duration-300 ease-in-out"
           style={{ width: `${(currentStep / (totalSteps - 1)) * 100}%` }}
         ></div>
       </div>

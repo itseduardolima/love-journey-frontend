@@ -18,19 +18,19 @@ export const Button = ({
   iconPosition = "left",
 }: ButtonProps) => {
   const baseClasses =
-    "px-4 w-full py-2 rounded-lg hover:transition-colors flex items-center justify-center";
+    "px-4 w-full py-2 rounded-2xl hover:transition-colors flex items-center justify-center";
   const disabledClasses = disabled ? "opacity-50 cursor-not-allowed" : "";
 
   const variantClasses =
     variant === "primary"
-      ? "bg-pink-600 text-white hover:bg-pink-500"
+      ? "bg-gradient-primary text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
       : variant === "default"
-      ? "bg-gray-600 text-white hover:bg-gray-500"
+      ? "bg-gradient-primary text-white hover:opacity-90 transition-all duration-300 transform hover:scale-105 shadow-lg"
       : variant === "edit"
       ? "text-blue-500 hover:text-blue-600"
       : variant === "delete"
       ? "text-red-500 w-2 hover:text-red-600"
-      : "bg-green-600 text-white hover:bg-green-500";
+      : "bg-gradient-primary text-white hover:bg-gradient-primary/90";
 
   return (
     <button

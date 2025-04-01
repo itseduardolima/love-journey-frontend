@@ -48,32 +48,38 @@ export default function QRCodePage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-900 text-gray-100 flex items-center justify-center p-4">
-      <div className="bg-gray-800 p-8 rounded-lg shadow-xl max-w-md w-full">
-        <h2 className="text-2xl font-bold text-pink-300 mb-6">
+    <div className="min-h-screen bg-secondary-dark text-gray-100 flex items-center justify-center p-4">
+      <div className="bg-secondary p-8 rounded-lg shadow-xl max-w-md w-full">
+        <h2 className="text-2xl font-bold text-primary-light mb-6 text-center">
           Sua linha do tempo está pronta!
         </h2>
         {qrCodeUrl && (
           <div className="mb-6 flex justify-center">
-            <img src={qrCodeUrl} alt="QR Code" className="w-48 h-48" />
+            <img
+              src={qrCodeUrl}
+              alt="QR Code"
+              className="w-48 h-48 p-2 bg-white rounded-lg"
+            />
           </div>
         )}
-        <Button
-          onClick={handleDownloadQRCode}
-          label="Download QR Code"
-          variant="primary"
-          icon={<Download size={20} />}
-        />
+        <div className="mb-6">
+          <Button
+            onClick={handleDownloadQRCode}
+            label="Download QR Code"
+            variant="primary"
+            icon={<Download size={20} className="mr-2" />}
+          />
+        </div>
         <div className="flex items-center mt-4">
           <input
             type="text"
             value={journeyLink}
             readOnly
-            className="flex-grow p-[6px] bg-gray-700 text-white rounded-l-lg focus:outline-none"
+            className="flex-grow p-[6px] bg-secondary-dark text-white rounded-l-lg focus:outline-none border border-gray-500 border-r-0"
           />
           <button
             onClick={handleCopyLink}
-            className="px-4 py-2 bg-pink-600 text-white rounded-r-lg hover:bg-pink-500 transition-colors"
+            className="px-4 py-2 border border-gray-500 border-l-0 bg-gradient-primary text-white rounded-r-lg hover:opacity-90 transition-colors"
           >
             {isCopied ? <Check size={20} /> : <Copy size={20} />}
           </button>

@@ -25,7 +25,7 @@ export const Input = ({
         value={value}
         placeholder={placeholder}
         onChange={onChange}
-        className="w-full p-3 bg-gray-600 text-white rounded-lg focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all"
+        className="w-full p-3 bg-transparent border border-gray-500 text-white rounded-2xl focus:ring-2 focus:ring-pink-500 focus:outline-none transition-all"
       />
       {error && <p className="text-red-500 text-sm">{error}</p>}
     </div>

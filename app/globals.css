@@ -59,6 +59,20 @@ body {
     /* Cores de UI */
     --radius: 0.5rem;
   }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #4f4f4f;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #203A43;
+    border-radius: 15px;
+  }
 }
 
 @layer utilities {

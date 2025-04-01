@@ -29,7 +29,7 @@ export function DatePicker({
         <Button
           size="xl"
           className={cn(
-            "w-full bg-gray-600 p-3 justify-start text-left font-normal",
+            "w-full bg-secondary border border-gray-500 p-3 justify-start text-left font-normal hover:scale-100",
             !date && "text-muted-foreground"
           )}
         >
