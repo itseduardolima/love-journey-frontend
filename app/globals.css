@@ -6,20 +6,71 @@ body {
   font-family: var(--font-geist-sans);
 }
 
-@layer utilities {
-  .text-balance {
-    text-wrap: balance;
-  }
-
-  .text-love {
-    font-family: var(--love);
-  }
-}
-
 @layer base {
   :root {
+    /* Cores primárias - Vermelho Rosado para Rosa */
+    --primary: 353 72% 58%; /* Vermelho Rosado #E94057 */
+    --primary-foreground: 0 0% 100%;
+    --primary-light: 340 82% 59%; /* Rosa #F5317F */
+
+    /* Cores secundárias - Azul Profundo para Azul Petróleo */
+    --secondary: 196 36% 19%; /* Azul Petróleo #203A43 */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-dark: 196 36% 10%; /* Azul Profundo #0F2027 */
+
+    /* Cores de acento - Âmbar Dourado */
+    --accent: 45 100% 50%; /* Âmbar Dourado #FFBF00 */
+    --accent-foreground: 0 0% 100%;
+
+    /* Cores de destaque - Verde Água */
+    --highlight: 189 38% 49%; /* Verde Água #4CA1AF */
+    --highlight-foreground: 0 0% 100%;
+
+    /* Cores de fundo e texto */
+    --background: 222 47% 11%;
+    --foreground: 0 0% 100%;
+
+    --card: 217 33% 17%;
+    --card-foreground: 0 0% 100%;
+
+    --popover: 222 47% 11%;
+    --popover-foreground: 0 0% 100%;
+
+    --muted: 215 16% 47%;
+    --muted-foreground: 215 20% 65%;
+
+    --border: 215 27% 31%;
+    --input: 215 27% 31%;
+    --ring: 353 72% 58%;
+
+    /* Cores de estado */
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
+
+    --success: 142 72% 45%;
+    --success-foreground: 0 0% 100%;
+
+    --warning: 45 93% 47%;
+    --warning-foreground: 0 0% 100%;
+
+    --info: 217 91% 60%;
+    --info-foreground: 0 0% 100%;
+
+    /* Cores de UI */
     --radius: 0.5rem;
   }
 }
 
+@layer utilities {
+  .text-gradient {
+    @apply bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary-light))] bg-clip-text text-transparent;
+  }
 
+  .bg-gradient-primary {
+    @apply bg-gradient-to-r from-[hsl(var(--primary))] to-[hsl(var(--primary-light))];
+  }
+
+  .bg-gradient-secondary {
+    @apply bg-gradient-to-r from-[hsl(var(--secondary-dark))] to-[hsl(var(--secondary))];
+  }
+}
