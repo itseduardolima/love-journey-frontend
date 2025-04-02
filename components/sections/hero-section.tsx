@@ -53,7 +53,7 @@ const HeroSection = () => {
               </Button>
             </motion.div>
           </div>
-          <div className="md:w-1/3">
+          <div className="md:w-2/5">
             <motion.div
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
@@ -64,8 +64,8 @@ const HeroSection = () => {
                 src={heroImage}
                 alt="Casal feliz"
                 className="rounded-2xl"
-                width={600}
-                height={400}
+                
+                
               />
             </motion.div>
           </div>

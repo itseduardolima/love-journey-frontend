@@ -12,6 +12,7 @@ const links = [
   { href: "#plans", label: "Planos" },
   { href: "#examples", label: "Exemplos" },
   { href: "#faq", label: "FAQ" },
+  { href: "#contact", label: "Contato" },
 ]
 
 const Header = () => {

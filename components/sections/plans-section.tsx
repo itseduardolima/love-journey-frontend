@@ -95,6 +95,8 @@ const PricingCard = ({
     enterprise: "bg-secondary-700 hover:bg-secondary-700/80 text-white shadow-none border border-gray-500",
   }[variant]
 
+  
+
   return (
     <motion.div
       variants={fadeIn}
@@ -148,6 +150,13 @@ const PlansSection = () => {
     router.push("/form/premium")
   }
 
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id);
+    if (element) {
+      element.scrollIntoView({ behavior: "smooth" });
+    }
+  };
+
   return (
     <section id="plans" className="py-20 bg-gradient-secondary min-h-screen flex items-center">
       <div className="container max-w-6xl mx-auto">
@@ -184,7 +193,7 @@ const PlansSection = () => {
               price="30"
               features={["Lembranças ilimitadas", "Acesso vitalício", "Design personalizado", "Suporte dedicado"]}
               buttonText="Entrar em contato"
-              onClick={() => window.open("mailto:eduardolima2417@gmail.com")}
+              onClick={() => scrollToSection("contact")}
               variant="enterprise"
             />
           </div>
